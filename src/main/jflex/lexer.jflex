@@ -1,5 +1,6 @@
 package mi.primer.scanner;
 
+import java_cup.runtime.*;
 %%
 
 //Opciones y definiciones regulares
@@ -9,65 +10,176 @@ package mi.primer.scanner;
 %char
 %line
 %column
-%standalone
+%cup
 
+%{
+    private Symbol symbol(int tipo, Object valor) {
+        return new Symbol(tipo, yyline, yycolumn, valor);
+    }
+%}
 //Definición regular
 palabra = [a-zA-Z]+
 identificador = [a-zA-Z][a-zA-Z0-9]*
-digito = [0-9]+
+digito = -?[0-9]+
 espacios_blanco = [\r|\n|\r\n| |\t]
-
+d_float  = -?[0-9]+(\.[0-9]+)?
 %%
 
 //Reglas léxicas
-"void"     { System.out.println("Lexema: "
-              + yytext()
-              + " columna: "
-              + yychar
-              + " fila: "
-              + yyline ); }
 
-"extends"  { System.out.println("Lexema: "
+"*"        { System.out.println("Lexema: "
               + yytext()
               + " columna: "
               + yychar
               + " fila: "
-              + yyline ); }
-"class"     { System.out.println("Lexema: "
-              + yytext()
-              + " columna: "
-              + yychar
-              + " fila: "
-              + yyline ); }
+              + yyline ); return symbol(sym.MULTI, yytext()); }
+
+
 "+"         { System.out.println("Lexema: "
               + yytext()
               + " columna: "
               + yychar
               + " fila: "
-              + yyline ); }
-">"         { System.out.println("Lexema: "
+              + yyline ); return symbol(sym.SUMA, yytext());  }
+
+"-"        { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.RESTA, yytext()); }
+
+"/"        { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.DIVIDIR, yytext()); }
+
+"="        { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.ASIGNAR, yytext()); }
+
+";"         { System.out.println("Lexema: "
               + yytext()
               + " columna: "
               + yychar
               + " fila: "
-              + yyline ); }
-"&&"        { System.out.println("Lexema: "
+              + yyline ); return symbol(sym.PUNTO_COMA, yytext());}
+
+">"      { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.MAYOR, yytext()); }
+
+"<"      { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.MENOR, yytext()); }
+
+"=="      { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.IGUAL, yytext()); }
+
+"!="      { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.DIFERENTE, yytext()); }
+
+
+">="      { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.MAYOR_IGUAL, yytext()); }
+
+"<="      { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.MENOR_IGUAL, yytext()); }
+
+
+
+"("         { System.out.println("Lexema: "
               + yytext()
               + " columna: "
               + yychar
               + " fila: "
-              + yyline ); }
-{identificador} { System.out.println("Lexema: "
+              + yyline ); return symbol(sym.PARENTESIS_IZQ, yytext());}
+
+")"         { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.PARENTESIS_DER, yytext());}
+
+"si"      { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline );}
+
+"imprimir" { System.out.println("Lexema: "
               + yytext()
               + " columna: "
               + yychar
               + " fila: "
               + yyline ); }
 
-{digito}    { System.out.println("Lexema: "
+
+
+"flotante"  { System.out.println("Lexema: "
               + yytext()
               + " columna: "
               + yychar
               + " fila: "
-              + yyline ); }
+              + yyline );return symbol(sym.FLOT, yytext()); }
+
+"entero"   { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline ); return symbol(sym.ENT, yytext()); }
+
+
+{identificador} { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline ); return symbol(sym.ID, yytext());}
+
+{digito}     { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline ); return symbol(sym.NUM, new Integer(yytext()));}
+
+{d_float}    { System.out.println("Lexema: "
+                      + yytext()
+                      + " columna: "
+                      + yychar
+                      + " fila: "
+                      + yyline ); return symbol(sym.FLOTANTE, new Float(yytext()));}
+
+
 {espacios_blanco}   { /*Ignorar estos símbolos*/ }

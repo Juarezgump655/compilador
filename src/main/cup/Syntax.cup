@@ -1,0 +1,70 @@
+package mi.primer.scanner;
+
+import java_cup.runtime.*;
+import java.util.ArrayList;
+
+parser code {:
+    public ArrayList<Object> resultados = new ArrayList<>();
+    public ArrayList<String> resultados2 = new ArrayList<>();
+:};
+
+action code {:
+
+:}
+
+
+terminal Integer NUM;
+terminal String ID, TIPO;
+terminal Float FLOTANTE;
+terminal MULTI, SUMA, RESTA, DIVIDIR, ASIGNAR;
+terminal MAYOR,MENOR, IGUAL, DIFERENTE, MAYOR_IGUAL, MENOR_IGUAL;
+terminal FLOT, ENT;
+terminal PUNTO_COMA;
+terminal PARENTESIS_IZQ, PARENTESIS_DER;
+
+
+non terminal inicio, funcion, procedimiento, declaracion,tipo, valor, imprimir, si, comparar, operador, operaciones, condicion;
+
+
+start with inicio;
+
+inicio ::= declaracion inicio
+       | funcion inicio
+       | procedimiento inicio
+       | /* Vacío */;
+
+tipo ::= FLOT
+         | ENT;
+
+valor ::= NUM
+      | FLOTANTE;
+
+declaracion ::= tipo ID PUNTO_COMA
+            | tipo ID ASIGNAR valor PUNTO_COMA
+            | tipo ID ASIGNAR operaciones PUNTO_COMA;
+
+comparar ::= MAYOR
+         | MENOR
+         | IGUAL
+         | DIFERENTE
+         | MAYOR_IGUAL
+         | MENOR_IGUAL;
+
+operaciones ::= valor operador valor
+            | ID operador ID;
+
+operador ::= MULTI
+         | SUMA
+         | RESTA
+         | DIVIDIR;
+
+
+
+condicion ::= ID comparar valor;
+
+
+
+
+
+
+
