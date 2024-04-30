@@ -1,3 +1,5 @@
-entero x = 8;
+entero x = 9;
 entero y= 9;
-entero resultado = x + y;
+entero resultado = x / y;
+imprimir(resultado);
+

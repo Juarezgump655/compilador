@@ -136,15 +136,6 @@ d_float  = -?[0-9]+(\.[0-9]+)?
               + " fila: "
               + yyline );}
 
-"imprimir" { System.out.println("Lexema: "
-              + yytext()
-              + " columna: "
-              + yychar
-              + " fila: "
-              + yyline ); }
-
-
-
 "flotante"  { System.out.println("Lexema: "
               + yytext()
               + " columna: "
@@ -159,8 +150,15 @@ d_float  = -?[0-9]+(\.[0-9]+)?
               + " fila: "
               + yyline ); return symbol(sym.ENT, yytext()); }
 
+"imprimir"  { System.out.println("Lexema imp: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline ); return symbol(sym.IMPRMIR, yytext()); }
 
-{identificador} { System.out.println("Lexema: "
+
+{identificador} { System.out.println("Lexema id: "
               + yytext()
               + " columna: "
               + yychar

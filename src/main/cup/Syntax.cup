@@ -2,15 +2,21 @@ package mi.primer.scanner;
 
 import java_cup.runtime.*;
 import java.util.ArrayList;
+import util.*;
+
 
 parser code {:
     public ArrayList<Object> resultados = new ArrayList<>();
     public ArrayList<String> resultados2 = new ArrayList<>();
+    public ArrayList<Variables> variables = new ArrayList<>();
+
 :};
 
 action code {:
 
+
 :}
+
 
 
 terminal Integer NUM;
@@ -21,42 +27,80 @@ terminal MAYOR,MENOR, IGUAL, DIFERENTE, MAYOR_IGUAL, MENOR_IGUAL;
 terminal FLOT, ENT;
 terminal PUNTO_COMA;
 terminal PARENTESIS_IZQ, PARENTESIS_DER;
+terminal IMPRMIR;
 
 
-non terminal inicio, funcion, procedimiento, declaracion,tipo, valor, imprimir, si, comparar, operador, operaciones, condicion;
-
-
+non terminal inicio, funcion, procedimiento, si, condicion;
+non terminal String valor;
+non terminal String tipo;
+non terminal Variables declaracion;
+non terminal print;
+non terminal String operaciones, operador, comparar;
 start with inicio;
 
 inicio ::= declaracion inicio
-       | funcion inicio
-       | procedimiento inicio
+       | print inicio
        | /* Vacío */;
 
-tipo ::= FLOT
-         | ENT;
+tipo ::= FLOT :f {: RESULT = f.toString(); :}
+         | ENT :e {: RESULT = e.toString(); :};
 
-valor ::= NUM
-      | FLOTANTE;
+valor ::= NUM:a {: RESULT = a.toString();:}
+      | FLOTANTE:a {: RESULT = a.toString();:};
+
+print ::= IMPRMIR PARENTESIS_IZQ ID:v PARENTESIS_DER PUNTO_COMA {:
+    for (Variables variable : variables) {
+        if (variable.getNombre().equals(v)) {
+            System.out.println(variable.getValor());
+        }
+    }
+:}
+      | IMPRMIR PARENTESIS_IZQ valor:v PARENTESIS_DER PUNTO_COMA {: System.out.println(v); :};
+
 
 declaracion ::= tipo ID PUNTO_COMA
-            | tipo ID ASIGNAR valor PUNTO_COMA
-            | tipo ID ASIGNAR operaciones PUNTO_COMA;
+            | tipo:tipo ID:id ASIGNAR valor:valor PUNTO_COMA {: variables.add(new Variables(tipo, valor, id)); :}
+            | tipo:tipo ID:id ASIGNAR operaciones:valor PUNTO_COMA  {:variables.add(new Variables(tipo, valor, id));  :};
 
-comparar ::= MAYOR
-         | MENOR
-         | IGUAL
-         | DIFERENTE
-         | MAYOR_IGUAL
-         | MENOR_IGUAL;
+comparar ::= MAYOR {:RESULT = ">";:}
+         | MENOR {:RESULT = "<";:}
+         | IGUAL {:RESULT = "==";:}
+         | DIFERENTE {:RESULT = "!=";:}
+         | MAYOR_IGUAL {:RESULT = ">=";:}
+         | MENOR_IGUAL {:RESULT = "<=";:};
 
-operaciones ::= valor operador valor
-            | ID operador ID;
+operaciones ::= valor operador:op valor operaciones
+            | ID:id operador:op ID:id_2 operaciones {:
+            String valor= "";
+            String valor2= "";
+            for( Variables variable : variables){
+                if(variable.getNombre().equals(id)){
+                    valor = variable.getValor();
+                }
+            }
+            for( Variables variable : variables){
+                if(variable.getNombre().equals(id_2)){
+                    valor2 = variable.getValor();
+                }
+            }
 
-operador ::= MULTI
-         | SUMA
-         | RESTA
-         | DIVIDIR;
+            if(op.equals("+")){
+               RESULT = Float.parseFloat(valor) + Float.parseFloat(valor2) +"";
+            }else if(op.equals("-")){
+               RESULT = Float.parseFloat(valor) - Float.parseFloat(valor2)+"";
+            }else if(op.equals("*")){
+               RESULT = Float.parseFloat(valor) * Float.parseFloat(valor2)+"";
+            }else if(op.equals("/")){
+                RESULT = Float.parseFloat(valor) / Float.parseFloat(valor2)+"";
+            }
+:}
+            | /* Vacío */;
+
+
+operador ::= MULTI {:RESULT = "*";:}
+         | SUMA {:RESULT = "+";:}
+         | RESTA {:RESULT = "-";:}
+         | DIVIDIR{:RESULT = "/";:};
 
 
 

@@ -41,6 +41,10 @@ public class CompiladoresApplication {
 
 			ArrayList<String> inverso = new ArrayList<String>(p.resultados2);
 			Collections.reverse(inverso);
+			for (String s : inverso) {
+				System.out.println("qaasdfasfdsafafasdf");
+				System.out.println(s);
+			}
 			return inverso;
 		} catch (FileNotFoundException ex) {
 			Logger.getLogger(CompiladoresApplication.class.getName()).log(Level.SEVERE, "Error al generar en cup ", ex);
