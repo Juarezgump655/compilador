@@ -23,6 +23,8 @@ identificador = [a-zA-Z][a-zA-Z0-9]*
 digito = -?[0-9]+
 espacios_blanco = [\r|\n|\r\n| |\t]
 d_float  = -?[0-9]+(\.[0-9]+)?
+texto = \"[^\"\\]+\"
+
 %%
 
 //Reglas léxicas
@@ -150,12 +152,65 @@ d_float  = -?[0-9]+(\.[0-9]+)?
               + " fila: "
               + yyline ); return symbol(sym.ENT, yytext()); }
 
+"funcion"  { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline ); return symbol(sym.FUNCTION, yytext()); }
+
+"retorna" { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline ); return symbol(sym.RETURN, yytext()); }
+
+"retorno" { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline ); return symbol(sym.RETORNO, yytext()); }
+
+","     { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline ); return symbol(sym.COMA, yytext()); }
+
+
+
+"fin_funcion" { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline ); return symbol(sym.FIN_FUNCION, yytext()); }
+
+
+
 "imprimir"  { System.out.println("Lexema imp: "
               + yytext()
               + " columna: "
               + yychar
               + " fila: "
               + yyline ); return symbol(sym.IMPRMIR, yytext()); }
+
+"cadena"  { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline ); return symbol(sym.CADENA, yytext()); }
+
+{texto}     { System.out.println("Lexema texto: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline ); return symbol(sym.TEXTO, yytext());}
 
 
 {identificador} { System.out.println("Lexema id: "

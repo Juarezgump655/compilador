@@ -12,6 +12,12 @@ public class Variables {
         this.nombre = nombre;
     }
 
+
+    public Variables(String tipo, String nombre) {
+        this.tipo = tipo;
+        this.nombre = nombre;
+    }
+
     public String getTipo() {
         return tipo;
     }
@@ -35,4 +41,5 @@ public class Variables {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
 }

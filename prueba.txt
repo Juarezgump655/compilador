@@ -1,5 +1,7 @@
 entero x = 9;
-entero y= 9;
-entero resultado = x / y;
+entero y= 5;
+entero resultado = x+y;
+imprimir("El resultado de la suma es: ");
 imprimir(resultado);
-
+cadena nombre = "Juan";
+imprimir(nombre);

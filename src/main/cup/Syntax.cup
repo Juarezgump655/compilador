@@ -9,6 +9,16 @@ parser code {:
     public ArrayList<Object> resultados = new ArrayList<>();
     public ArrayList<String> resultados2 = new ArrayList<>();
     public ArrayList<Variables> variables = new ArrayList<>();
+    public String error = "";
+
+    public void syntax_error(Symbol s){
+            error = "Error Sintáctico en la Línea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+".";
+            System.err.println(error);
+    }
+
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
+            System.err.println("Error síntactico irrecuperable en la Línea " + (s.left)+ " Columna "+s.right+". Componente " + s.value + " no reconocido.");
+    }
 
 :};
 
@@ -20,14 +30,17 @@ action code {:
 
 
 terminal Integer NUM;
-terminal String ID, TIPO;
+terminal String ID, TIPO , TEXTO;
 terminal Float FLOTANTE;
 terminal MULTI, SUMA, RESTA, DIVIDIR, ASIGNAR;
 terminal MAYOR,MENOR, IGUAL, DIFERENTE, MAYOR_IGUAL, MENOR_IGUAL;
-terminal FLOT, ENT;
-terminal PUNTO_COMA;
+terminal FLOT, ENT, CADENA;
+terminal PUNTO_COMA, COMA;
 terminal PARENTESIS_IZQ, PARENTESIS_DER;
 terminal IMPRMIR;
+terminal FUNCTION;
+terminal RETURN, RETORNO, FIN_FUNCION;
+
 
 
 non terminal inicio, funcion, procedimiento, si, condicion;
@@ -36,17 +49,20 @@ non terminal String tipo;
 non terminal Variables declaracion;
 non terminal print;
 non terminal String operaciones, operador, comparar;
+non terminal String parametros;
+non terminal intrucciones;
+non terminal concatenar;
+
+
+
 start with inicio;
+
+
 
 inicio ::= declaracion inicio
        | print inicio
        | /* Vacío */;
 
-tipo ::= FLOT :f {: RESULT = f.toString(); :}
-         | ENT :e {: RESULT = e.toString(); :};
-
-valor ::= NUM:a {: RESULT = a.toString();:}
-      | FLOTANTE:a {: RESULT = a.toString();:};
 
 print ::= IMPRMIR PARENTESIS_IZQ ID:v PARENTESIS_DER PUNTO_COMA {:
     for (Variables variable : variables) {
@@ -55,21 +71,41 @@ print ::= IMPRMIR PARENTESIS_IZQ ID:v PARENTESIS_DER PUNTO_COMA {:
         }
     }
 :}
-      | IMPRMIR PARENTESIS_IZQ valor:v PARENTESIS_DER PUNTO_COMA {: System.out.println(v); :};
+      | IMPRMIR PARENTESIS_IZQ  TEXTO:texto PARENTESIS_DER PUNTO_COMA {:
+           texto = texto.substring(1, texto.length() - 1);
+           System.out.println(texto);
+       :};
 
 
-declaracion ::= tipo ID PUNTO_COMA
+funcion ::= FUNCTION ID PARENTESIS_IZQ parametros PARENTESIS_DER RETURN tipo  intrucciones RETORNO ID  FIN_FUNCION;
+
+
+intrucciones ::= declaracion intrucciones
+              | print intrucciones
+              | /* Vacío */;
+
+parametros ::= tipo ID
+           | tipo ID COMA parametros
+           | /* Vacío */;
+
+declaracion ::= tipo:tipo ID:id PUNTO_COMA {: variables.add(new Variables (tipo, id)); :}
             | tipo:tipo ID:id ASIGNAR valor:valor PUNTO_COMA {: variables.add(new Variables(tipo, valor, id)); :}
             | tipo:tipo ID:id ASIGNAR operaciones:valor PUNTO_COMA  {:variables.add(new Variables(tipo, valor, id));  :};
 
-comparar ::= MAYOR {:RESULT = ">";:}
-         | MENOR {:RESULT = "<";:}
-         | IGUAL {:RESULT = "==";:}
-         | DIFERENTE {:RESULT = "!=";:}
-         | MAYOR_IGUAL {:RESULT = ">=";:}
-         | MENOR_IGUAL {:RESULT = "<=";:};
 
-operaciones ::= valor operador:op valor operaciones
+
+operaciones ::= valor:val operador:op valor:val2 operaciones{:
+            if(op.equals("+")){
+                RESULT = Float.parseFloat(val) + Float.parseFloat(val2) +"";
+            }else if(op.equals("-")){
+                RESULT = Float.parseFloat(val) - Float.parseFloat(val2)+"";
+            }else if(op.equals("*")){
+                RESULT = Float.parseFloat(val) * Float.parseFloat(val2)+"";
+            }else if(op.equals("/")){
+                RESULT = Float.parseFloat(val) / Float.parseFloat(val2)+"";
+            }
+:}
+
             | ID:id operador:op ID:id_2 operaciones {:
             String valor= "";
             String valor2= "";
@@ -102,7 +138,20 @@ operador ::= MULTI {:RESULT = "*";:}
          | RESTA {:RESULT = "-";:}
          | DIVIDIR{:RESULT = "/";:};
 
+comparar ::= MAYOR {:RESULT = ">";:}
+         | MENOR {:RESULT = "<";:}
+         | IGUAL {:RESULT = "==";:}
+         | DIFERENTE {:RESULT = "!=";:}
+         | MAYOR_IGUAL {:RESULT = ">=";:}
+         | MENOR_IGUAL {:RESULT = "<=";:};
 
+tipo ::= FLOT :f {: RESULT = f.toString(); :}
+         | ENT :e {: RESULT = e.toString(); :}
+         | CADENA:t {: RESULT = t.toString(); :};
+
+valor ::= NUM:a {: RESULT = a.toString();:}
+      | FLOTANTE:a {: RESULT = a.toString();:}
+       | TEXTO:a {: RESULT =  a.substring(1, a.length() - 1);:};
 
 condicion ::= ID comparar valor;
 
