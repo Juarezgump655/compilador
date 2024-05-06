@@ -1,7 +1,7 @@
 entero x = 9;
-entero y= 5;
+flotante y = 5.8;
 entero resultado = x+y;
-imprimir("El resultado de la suma es: ");
+imprimir("El resultado de la suma es: " + resultado);
 imprimir(resultado);
 cadena nombre = "Juan";
-imprimir(nombre);
+imprimir("Hola " + nombre + " ¿Cómo estás? "+ y);

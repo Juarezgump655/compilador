@@ -7,13 +7,14 @@ import util.*;
 
 parser code {:
     public ArrayList<Object> resultados = new ArrayList<>();
-    public ArrayList<String> resultados2 = new ArrayList<>();
+    public ArrayList<String> consola = new ArrayList<>();
     public ArrayList<Variables> variables = new ArrayList<>();
     public String error = "";
 
     public void syntax_error(Symbol s){
             error = "Error Sintáctico en la Línea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+".";
             System.err.println(error);
+            consola.add(error);
     }
 
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
@@ -47,12 +48,12 @@ non terminal inicio, funcion, procedimiento, si, condicion;
 non terminal String valor;
 non terminal String tipo;
 non terminal Variables declaracion;
-non terminal print;
+non terminal print, printP;
 non terminal String operaciones, operador, comparar;
 non terminal String parametros;
 non terminal intrucciones;
-non terminal concatenar;
-
+non terminal String concatenar, concatenarp;
+non terminal String declaracionP;
 
 
 start with inicio;
@@ -64,17 +65,27 @@ inicio ::= declaracion inicio
        | /* Vacío */;
 
 
-print ::= IMPRMIR PARENTESIS_IZQ ID:v PARENTESIS_DER PUNTO_COMA {:
-    for (Variables variable : variables) {
-        if (variable.getNombre().equals(v)) {
-            System.out.println(variable.getValor());
-        }
-    }
-:}
-      | IMPRMIR PARENTESIS_IZQ  TEXTO:texto PARENTESIS_DER PUNTO_COMA {:
-           texto = texto.substring(1, texto.length() - 1);
-           System.out.println(texto);
-       :};
+print ::= IMPRMIR PARENTESIS_IZQ printP:p{:
+    System.out.println(p.toString());
+    consola.add(p.toString());
+    :}
+;
+
+printP ::= TEXTO:texto PARENTESIS_DER PUNTO_COMA {:
+                     texto = texto.substring(1, texto.length() - 1);
+                        RESULT = texto;
+                 :}
+          | ID:v PARENTESIS_DER PUNTO_COMA {:
+                for (Variables variable : variables) {
+                    if (variable.getNombre().equals(v)) {
+                    RESULT = variable.getValor();
+                    }
+                }
+            :}
+           | concatenar:c PARENTESIS_DER PUNTO_COMA {:
+                RESULT = c;
+            :};
+
 
 
 funcion ::= FUNCTION ID PARENTESIS_IZQ parametros PARENTESIS_DER RETURN tipo  intrucciones RETORNO ID  FIN_FUNCION;
@@ -89,8 +100,12 @@ parametros ::= tipo ID
            | /* Vacío */;
 
 declaracion ::= tipo:tipo ID:id PUNTO_COMA {: variables.add(new Variables (tipo, id)); :}
-            | tipo:tipo ID:id ASIGNAR valor:valor PUNTO_COMA {: variables.add(new Variables(tipo, valor, id)); :}
-            | tipo:tipo ID:id ASIGNAR operaciones:valor PUNTO_COMA  {:variables.add(new Variables(tipo, valor, id));  :};
+             | tipo:tipo ID:id ASIGNAR declaracionP:valor PUNTO_COMA {:
+              System.out.println("Tipo: "+tipo+" ID: "+id+" Valor: "+valor);
+              variables.add(new Variables(tipo, valor, id)); :};
+
+declaracionP ::= valor:valor {:RESULT = valor;:}
+               | operaciones:operaciones {:RESULT = operaciones;:};
 
 
 
@@ -149,8 +164,29 @@ tipo ::= FLOT :f {: RESULT = f.toString(); :}
          | ENT :e {: RESULT = e.toString(); :}
          | CADENA:t {: RESULT = t.toString(); :};
 
+concatenar ::= TEXTO:t SUMA concatenarp:c {: RESULT = t.substring(1, t.length() - 1) + c; :}
+             | ID:id SUMA concatenarp:c
+             {:
+              for (Variables variable : variables) {
+                     if (variable.getNombre().equals(id)) {
+                         RESULT = variable.getValor() + c;
+                     }
+                 }
+             ;:};
+
+concatenarp::= TEXTO:t {: RESULT = t.substring(1, t.length() - 1); :}
+            | ID:id
+            {:
+             for (Variables variable : variables) {
+                    if (variable.getNombre().equals(id)) {
+                        RESULT = variable.getValor() ;
+                    }
+                }
+            ;:}
+            | concatenar:c {: RESULT = c; :};
+
 valor ::= NUM:a {: RESULT = a.toString();:}
-      | FLOTANTE:a {: RESULT = a.toString();:}
+       | FLOTANTE:a {: RESULT = a.toString();:}
        | TEXTO:a {: RESULT =  a.substring(1, a.length() - 1);:};
 
 condicion ::= ID comparar valor;

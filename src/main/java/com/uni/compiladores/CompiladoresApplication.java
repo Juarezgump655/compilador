@@ -15,13 +15,6 @@ public class CompiladoresApplication {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		SpringApplication.run(CompiladoresApplication.class, args);
-		try{
-			CompiladoresApplication compiladoresApplication = new CompiladoresApplication();
-			CompiladoresApplication.pruebaCompi();
-		}catch (IOException e){
-			System.out.println("Error en la lectura del archivo");
-		}
-
 	}
 
 	public static void pruebaCompi() throws IOException {
@@ -39,13 +32,12 @@ public class CompiladoresApplication {
 			parser p = new parser(new Scanner(reader));
 			p.parse();
 
-			ArrayList<String> inverso = new ArrayList<String>(p.resultados2);
-			Collections.reverse(inverso);
-			for (String s : inverso) {
-				System.out.println("qaasdfasfdsafafasdf");
+			ArrayList<String> consola = new ArrayList<String>(p.consola);
+			System.out.println("RESULTADO CONSOLA");
+			for (String s : consola) {
 				System.out.println(s);
 			}
-			return inverso;
+			return consola;
 		} catch (FileNotFoundException ex) {
 			Logger.getLogger(CompiladoresApplication.class.getName()).log(Level.SEVERE, "Error al generar en cup ", ex);
 		} catch (Exception e) {

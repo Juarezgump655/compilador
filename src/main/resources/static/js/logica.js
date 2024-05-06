@@ -1,3 +1,3 @@
-function leerJava() {
+function leerMini() {
     let datos = {}
 }

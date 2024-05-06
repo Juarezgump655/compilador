@@ -23,8 +23,8 @@
                 <br>
                 <div class="row justify-content-center">
                     <div class="col-lg">
-                        <label for="txtJava" class="form-label">Codigo Java</label>
-                        <textarea id="txtJava" name="txtJava" class="form-control"></textarea>
+                        <label for="txtMini" class="form-label">Codigo MiniLab</label>
+                        <textarea id="txtMini" name="txtMini" class="form-control"></textarea>
                     </div>
 
                     <div class="col-lg">
@@ -65,19 +65,25 @@
 
         var formData = new FormData(this);
 
-        fetch('/traducir', {
+        fetch('/compilador/traducir', {
             method: 'POST',
             body: formData
         })
-            .then(response => response.text())
+            .then(response => response.json()) // Parsear la respuesta como JSON
             .then(data => {
-                document.getElementById('txtMinilab').value = data;
+                // Convertir la matriz en una cadena con saltos de línea
+                var resultString = data.join('\n');
+
+                // Asignar la cadena al valor del textarea
+                document.getElementById('txtMinilab').value = resultString;
+
                 console.log(data);
             })
             .catch(error => {
                 console.error('Error:', error);
             });
     });
+
 
 
 
