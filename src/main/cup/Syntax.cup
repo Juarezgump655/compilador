@@ -3,6 +3,9 @@ package mi.primer.scanner;
 import java_cup.runtime.*;
 import java.util.ArrayList;
 import util.*;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 
 parser code {:
@@ -49,7 +52,7 @@ non terminal String valor;
 non terminal String tipo;
 non terminal Variables declaracion;
 non terminal print, printP;
-non terminal String operaciones, operador, comparar;
+non terminal String operaciones, operador, comparar,  operacionesP ;
 non terminal String parametros;
 non terminal intrucciones;
 non terminal String concatenar, concatenarp;
@@ -100,52 +103,52 @@ parametros ::= tipo ID
            | /* Vacío */;
 
 declaracion ::= tipo:tipo ID:id PUNTO_COMA {: variables.add(new Variables (tipo, id)); :}
-             | tipo:tipo ID:id ASIGNAR declaracionP:valor PUNTO_COMA {:
+             | tipo:tipo ID:id ASIGNAR declaracionP:valor  {:
               System.out.println("Tipo: "+tipo+" ID: "+id+" Valor: "+valor);
               variables.add(new Variables(tipo, valor, id)); :};
 
-declaracionP ::= valor:valor {:RESULT = valor;:}
-               | operaciones:operaciones {:RESULT = operaciones;:};
+declaracionP ::= valor:valor PUNTO_COMA{:RESULT = valor;:}
+               | operaciones:operaciones  PUNTO_COMA {:RESULT = operaciones;:}
+               ;
 
 
 
-operaciones ::= valor:val operador:op valor:val2 operaciones{:
-            if(op.equals("+")){
-                RESULT = Float.parseFloat(val) + Float.parseFloat(val2) +"";
-            }else if(op.equals("-")){
-                RESULT = Float.parseFloat(val) - Float.parseFloat(val2)+"";
-            }else if(op.equals("*")){
-                RESULT = Float.parseFloat(val) * Float.parseFloat(val2)+"";
-            }else if(op.equals("/")){
-                RESULT = Float.parseFloat(val) / Float.parseFloat(val2)+"";
-            }
-:}
+operaciones ::= valor:val operador:op operacionesP:p {:
+              System.out.println("Valor: "+val+" Operador: "+op+" OperacionesP: "+p);
+              String operacion = val+op+p;
+              System.out.println("Operacion: "+operacion);
+              ScriptEngineManager manager = new ScriptEngineManager();
+             			ScriptEngine engine = manager.getEngineByName("js");
+             			Object resultado = engine.eval(operacion);
+             			System.out.println("Resultado: "+resultado);
+             			RESULT = resultado.toString();
+             :}
+             | ID:id operador:op operacionesP:p{:
+              String  valor = "";
+                 for (Variables variable : variables) {
+                     if (variable.getNombre().equals(id)) {
+                         valor = variable.getValor();
+                     }
+                 }
+             System.out.println("Valor: "+valor+" Operador: "+op+" OperacionesP: "+p);
+                        String operacion = valor+op+p;
+                        System.out.println("Operacion: "+operacion);
+                        ScriptEngineManager manager = new ScriptEngineManager();
+                       			ScriptEngine engine = manager.getEngineByName("js");
+                       			Object resultado = engine.eval(operacion);
+                       			System.out.println("Resultado: "+resultado);
+                       			RESULT = resultado.toString();
+                :};
 
-            | ID:id operador:op ID:id_2 operaciones {:
-            String valor= "";
-            String valor2= "";
-            for( Variables variable : variables){
-                if(variable.getNombre().equals(id)){
-                    valor = variable.getValor();
-                }
-            }
-            for( Variables variable : variables){
-                if(variable.getNombre().equals(id_2)){
-                    valor2 = variable.getValor();
-                }
-            }
-
-            if(op.equals("+")){
-               RESULT = Float.parseFloat(valor) + Float.parseFloat(valor2) +"";
-            }else if(op.equals("-")){
-               RESULT = Float.parseFloat(valor) - Float.parseFloat(valor2)+"";
-            }else if(op.equals("*")){
-               RESULT = Float.parseFloat(valor) * Float.parseFloat(valor2)+"";
-            }else if(op.equals("/")){
-                RESULT = Float.parseFloat(valor) / Float.parseFloat(valor2)+"";
-            }
-:}
-            | /* Vacío */;
+operacionesP ::=  valor:val {:RESULT = val; :}
+                  | ID:id {:
+                  for (Variables variable : variables) {
+                     if (variable.getNombre().equals(id)) {
+                         RESULT = variable.getValor();
+                     }
+                     }
+                  :}
+                  | operaciones:c {:RESULT = c;:};
 
 
 operador ::= MULTI {:RESULT = "*";:}

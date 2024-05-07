@@ -1,6 +1,6 @@
 entero x = 9;
-flotante y = 5.8;
-entero resultado = x+y;
+entero y = 5;
+entero resultado = x+y * 5+5;
 imprimir("El resultado de la suma es: " + resultado);
 imprimir(resultado);
 cadena nombre = "Juan";
