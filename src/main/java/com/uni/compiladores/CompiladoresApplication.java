@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mi.primer.scanner.*;
+import util.Condicion;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -20,18 +21,6 @@ public class CompiladoresApplication {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		SpringApplication.run(CompiladoresApplication.class, args);
-
-		/*String operacion = "((2+3*8+7)*4)/26+45";
-
-		try {
-			ScriptEngineManager manager = new ScriptEngineManager();
-			ScriptEngine engine = manager.getEngineByName("js");
-			Object resultado = engine.eval(operacion);
-			System.out.println("Resultado: " + resultado);
-		} catch (ScriptException e) {
-			e.printStackTrace();
-		}*/
-
 	}
 
 	public static void pruebaCompi() throws IOException {

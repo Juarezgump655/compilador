@@ -136,7 +136,29 @@ texto = \"[^\"\\]+\"
               + " columna: "
               + yychar
               + " fila: "
-              + yyline );}
+              + yyline );return symbol(sym.SI, yytext()); }
+
+"entonces" { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline );return symbol(sym.ENTONCES, yytext()); }
+
+"fin_si"  { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline );return symbol(sym.FIN_SI, yytext()); }
+
+"sino"    { System.out.println("Lexema: "
+              + yytext()
+              + " columna: "
+              + yychar
+              + " fila: "
+              + yyline );return symbol(sym.SINO, yytext()); }
+
 
 "flotante"  { System.out.println("Lexema: "
               + yytext()

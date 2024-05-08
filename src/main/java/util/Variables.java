@@ -12,6 +12,9 @@ public class Variables {
         this.nombre = nombre;
     }
 
+    public Variables() {
+    }
+
 
     public Variables(String tipo, String nombre) {
         this.tipo = tipo;
@@ -42,4 +45,25 @@ public class Variables {
         this.nombre = nombre;
     }
 
+    public static Float parseNumber(String stringValue) {
+        try {
+            // Intenta convertir el String a un número entero
+            return Float.parseFloat(stringValue);
+        } catch (NumberFormatException e) {
+            // Si no se puede convertir a entero, entonces es un número flotante
+            return null;
+        }
+    }
+
+    public Boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            Float d = Float.parseFloat(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
 }

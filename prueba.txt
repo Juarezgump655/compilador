@@ -1,7 +1,13 @@
 entero x = 9;
 entero y = 5;
-entero resultado = x+y * 5+5;
+entero resultado = x+y * 5+5 * 2+3;
 imprimir("El resultado de la suma es: " + resultado);
 imprimir(resultado);
 cadena nombre = "Juan";
 imprimir("Hola " + nombre + " ¿Cómo estás? "+ y);
+cadena nombre2 = "Jua2n";
+
+si (nombre2 == nombre)  entonces
+    entero xd = 1;
+    imprimir(xd);
+fin_si;

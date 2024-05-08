@@ -13,6 +13,7 @@ parser code {:
     public ArrayList<String> consola = new ArrayList<>();
     public ArrayList<Variables> variables = new ArrayList<>();
     public String error = "";
+    public Condicion condicion = new Condicion();
 
     public void syntax_error(Symbol s){
             error = "Error Sintáctico en la Línea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+".";
@@ -42,30 +43,37 @@ terminal FLOT, ENT, CADENA;
 terminal PUNTO_COMA, COMA;
 terminal PARENTESIS_IZQ, PARENTESIS_DER;
 terminal IMPRMIR;
-terminal FUNCTION;
+terminal FUNCTION, SI, ENTONCES, FIN_SI, SINO;
 terminal RETURN, RETORNO, FIN_FUNCION;
 
 
 
-non terminal inicio, funcion, procedimiento, si, condicion;
+non terminal inicio, procedimiento, si;
 non terminal String valor;
 non terminal String tipo;
 non terminal Variables declaracion;
 non terminal print, printP;
-non terminal String operaciones, operador, comparar,  operacionesP ;
+non terminal String operaciones, operador, comparar,  operacionesP ,condicionP ;
 non terminal String parametros;
 non terminal intrucciones;
 non terminal String concatenar, concatenarp;
 non terminal String declaracionP;
+non terminal Metodos funcion;
+non terminal if, ifP;
+non terminal Boolean condicion;
+
 
 
 start with inicio;
 
 
 
-inicio ::= declaracion inicio
-       | print inicio
-       | /* Vacío */;
+inicio ::= intrucciones;
+
+intrucciones  ::= declaracion intrucciones
+              | print intrucciones
+              | if intrucciones
+              | /* Vacío */;
 
 
 print ::= IMPRMIR PARENTESIS_IZQ printP:p{:
@@ -94,9 +102,6 @@ printP ::= TEXTO:texto PARENTESIS_DER PUNTO_COMA {:
 funcion ::= FUNCTION ID PARENTESIS_IZQ parametros PARENTESIS_DER RETURN tipo  intrucciones RETORNO ID  FIN_FUNCION;
 
 
-intrucciones ::= declaracion intrucciones
-              | print intrucciones
-              | /* Vacío */;
 
 parametros ::= tipo ID
            | tipo ID COMA parametros
@@ -108,20 +113,64 @@ declaracion ::= tipo:tipo ID:id PUNTO_COMA {: variables.add(new Variables (tipo,
               variables.add(new Variables(tipo, valor, id)); :};
 
 declaracionP ::= valor:valor PUNTO_COMA{:RESULT = valor;:}
-               | operaciones:operaciones  PUNTO_COMA {:RESULT = operaciones;:}
+               | operaciones:operacion  PUNTO_COMA {:
+                ScriptEngineManager manager = new ScriptEngineManager();
+                       			ScriptEngine engine = manager.getEngineByName("js");
+                       			Object resultado = engine.eval(operacion);
+                       			System.out.println("Resultado: "+resultado);
+                       			RESULT = resultado.toString();
+               ;:}
                ;
 
 
+if ::= SI PARENTESIS_IZQ condicion:condicion PARENTESIS_DER ENTONCES  intrucciones:ins ifP{:
+            if (condicion) {
+                System.out.println("Se cumple la condición");
+                System.out.println(condicion.toString());
+            } else {
+                 System.out.println("No se cumple la condición");
+                 System.out.println(condicion.toString());
+            }
+:};
+
+ifP ::= FIN_SI PUNTO_COMA
+       | SINO intrucciones FIN_SI PUNTO_COMA;
+
+
+condicion ::= ID:id comparar:c condicionP:val
+           {:
+           String valor = "";
+           for (Variables variable : variables) {
+                     if (variable.getNombre().equals(id)) {
+                         valor = variable.getValor();
+                     }
+           }
+           Boolean resultado =  condicion.evaluar(c,valor, val);
+           RESULT = resultado;
+           :}
+          | valor:v comparar:c condicionP:val{:
+             Boolean resultado =  condicion.evaluar(c, v, val);
+             RESULT = resultado;
+          :};
+
+condicionP ::= ID:id{:
+           String  valor = "";
+                 for (Variables variable : variables) {
+                     if (variable.getNombre().equals(id)) {
+                         valor = variable.getValor();
+                     }
+                 }
+             RESULT = valor.toString();
+            :}
+           | valor:valor {:
+            RESULT = valor.toString();
+           :};
 
 operaciones ::= valor:val operador:op operacionesP:p {:
               System.out.println("Valor: "+val+" Operador: "+op+" OperacionesP: "+p);
               String operacion = val+op+p;
               System.out.println("Operacion: "+operacion);
-              ScriptEngineManager manager = new ScriptEngineManager();
-             			ScriptEngine engine = manager.getEngineByName("js");
-             			Object resultado = engine.eval(operacion);
-             			System.out.println("Resultado: "+resultado);
-             			RESULT = resultado.toString();
+             			RESULT = operacion;
              :}
              | ID:id operador:op operacionesP:p{:
               String  valor = "";
@@ -133,12 +182,9 @@ operaciones ::= valor:val operador:op operacionesP:p {:
              System.out.println("Valor: "+valor+" Operador: "+op+" OperacionesP: "+p);
                         String operacion = valor+op+p;
                         System.out.println("Operacion: "+operacion);
-                        ScriptEngineManager manager = new ScriptEngineManager();
-                       			ScriptEngine engine = manager.getEngineByName("js");
-                       			Object resultado = engine.eval(operacion);
-                       			System.out.println("Resultado: "+resultado);
-                       			RESULT = resultado.toString();
-                :};
+                       			RESULT = operacion;
+                :}
+                ;
 
 operacionesP ::=  valor:val {:RESULT = val; :}
                   | ID:id {:
@@ -192,7 +238,6 @@ valor ::= NUM:a {: RESULT = a.toString();:}
        | FLOTANTE:a {: RESULT = a.toString();:}
        | TEXTO:a {: RESULT =  a.substring(1, a.length() - 1);:};
 
-condicion ::= ID comparar valor;
 
 
 

@@ -8,12 +8,13 @@ public class Metodos {
     private String retorno;
 
     private LinkedList<Parametros> parametros;
+    private  LinkedList<Object> ins;
 
-
-    public Metodos(String nombre, String retorno, LinkedList<Parametros> parametros) {
+    public Metodos(String nombre, String retorno, LinkedList<Parametros> parametros, LinkedList<Object> ins) {
         this.nombre = nombre;
         this.retorno = retorno;
         this.parametros = parametros;
+        this.ins = ins;
     }
 
     public String getNombre() {
@@ -39,6 +40,14 @@ public class Metodos {
 
     public void setParametros(LinkedList<Parametros> parametros) {
         this.parametros = parametros;
+    }
+
+    public LinkedList<Object> getIns() {
+        return ins;
+    }
+
+    public void setIns(LinkedList<Object> ins) {
+        this.ins = ins;
     }
 
 }
