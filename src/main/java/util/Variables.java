@@ -1,6 +1,8 @@
 package util;
 
 
+import java.util.ArrayList;
+
 public class Variables {
     public String tipo;
     public String valor;
@@ -65,5 +67,15 @@ public class Variables {
             return false;
         }
         return true;
+    }
+
+    public static String obtenerValorVaiable( String nombre, ArrayList<Variables> variables ){
+        for (Variables variable : variables) {
+            if (variable.getNombre().equals(nombre)){
+                System.out.println("Variable encontrada: " + variable.getNombre() + " con valor: " + variable.getValor());
+                return variable.getValor();
+            }
+        }
+        return null;
     }
 }

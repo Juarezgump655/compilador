@@ -19,6 +19,7 @@ import javax.script.ScriptException;
 @SpringBootApplication
 public class CompiladoresApplication {
 
+
 	public static void main(String[] args) throws FileNotFoundException {
 		SpringApplication.run(CompiladoresApplication.class, args);
 	}
@@ -39,6 +40,7 @@ public class CompiladoresApplication {
 			p.parse();
 
 			ArrayList<String> consola = new ArrayList<String>(p.consola);
+			//Collections.reverse(consola);
 			System.out.println("RESULTADO CONSOLA");
 			for (String s : consola) {
 				System.out.println(s);

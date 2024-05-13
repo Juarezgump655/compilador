@@ -11,12 +11,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/compilador")
 public class CompiladorController {
+
+    ArrayList<String> consola = new ArrayList<String>();
 
     @PostMapping(value = "/traducir")
     public ArrayList<String> traducir(/*@RequestParam("txtMini") String txtMini,
@@ -25,12 +28,14 @@ public class CompiladorController {
     }
 
     public ArrayList<String> compilarCup() {
+        consola.clear();
         try {
             Reader reader = new FileReader("prueba.txt");
             parser p = new parser(new Scanner(reader));
             p.parse();
 
-            ArrayList<String> consola = new ArrayList<String>(p.consola);
+             consola = new ArrayList<String>(p.consola);
+            Collections.reverse(consola);
             System.out.println("RESULTADO CONSOLA");
             for (String s : consola) {
                 System.out.println(s);

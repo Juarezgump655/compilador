@@ -10,11 +10,13 @@ import javax.script.ScriptException;
 
 parser code {:
     public ArrayList<Object> resultados = new ArrayList<>();
-    public ArrayList<String> consola = new ArrayList<>();
+
     public ArrayList<Variables> variables = new ArrayList<>();
     public String error = "";
     public Condicion condicion = new Condicion();
-
+    public Variables variable = new Variables();
+    public Imprimir imprimir = new Imprimir();
+     public ArrayList<String> consola = imprimir.getConsola();
     public void syntax_error(Symbol s){
             error = "Error Sintáctico en la Línea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+".";
             System.err.println(error);
@@ -52,10 +54,10 @@ non terminal inicio, procedimiento, si;
 non terminal String valor;
 non terminal String tipo;
 non terminal Variables declaracion;
-non terminal print, printP;
+non terminal String printP, print;
 non terminal String operaciones, operador, comparar,  operacionesP ,condicionP ;
 non terminal String parametros;
-non terminal intrucciones;
+non terminal intrucciones, instruccionesif;
 non terminal String concatenar, concatenarp;
 non terminal String declaracionP;
 non terminal Metodos funcion;
@@ -68,17 +70,19 @@ start with inicio;
 
 
 
-inicio ::= intrucciones;
+inicio ::= intrucciones{:imprimir.listaImpri.clear();:};
 
 intrucciones  ::= declaracion intrucciones
-              | print intrucciones
+              | print:p intrucciones {:
+                imprimir.listaImpri.add(p);
+                imprimir.ejecutar();
+              :}
               | if intrucciones
               | /* Vacío */;
 
 
 print ::= IMPRMIR PARENTESIS_IZQ printP:p{:
-    System.out.println(p.toString());
-    consola.add(p.toString());
+         RESULT = p;
     :}
 ;
 
@@ -87,11 +91,7 @@ printP ::= TEXTO:texto PARENTESIS_DER PUNTO_COMA {:
                         RESULT = texto;
                  :}
           | ID:v PARENTESIS_DER PUNTO_COMA {:
-                for (Variables variable : variables) {
-                    if (variable.getNombre().equals(v)) {
-                    RESULT = variable.getValor();
-                    }
-                }
+                 RESULT = variable.obtenerValorVaiable(v, variables);
             :}
            | concatenar:c PARENTESIS_DER PUNTO_COMA {:
                 RESULT = c;
@@ -123,28 +123,34 @@ declaracionP ::= valor:valor PUNTO_COMA{:RESULT = valor;:}
                ;
 
 
-if ::= SI PARENTESIS_IZQ condicion:condicion PARENTESIS_DER ENTONCES  intrucciones:ins ifP{:
+if ::= SI PARENTESIS_IZQ condicion:condicion PARENTESIS_DER ENTONCES  instruccionesif:p ifP{:
             if (condicion) {
                 System.out.println("Se cumple la condición");
-                System.out.println(condicion.toString());
+                imprimir.listaImpri.add(p.toString());
             } else {
                  System.out.println("No se cumple la condición");
                  System.out.println(condicion.toString());
+                 consola.remove(consola.size() - 1);
             }
 :};
 
 ifP ::= FIN_SI PUNTO_COMA
        | SINO intrucciones FIN_SI PUNTO_COMA;
 
+instruccionesif ::= declaracion:p instruccionesif{:
+                 variables.add(new Variables(p.tipo, p.valor, p.nombre));
+                 :}
+                | print:p instruccionesif {:
+                RESULT = p;
+                :}
+                | if instruccionesif
+                | /* Vacío */;
+
 
 condicion ::= ID:id comparar:c condicionP:val
            {:
            String valor = "";
-           for (Variables variable : variables) {
-                     if (variable.getNombre().equals(id)) {
-                         valor = variable.getValor();
-                     }
-           }
+           valor = variable.obtenerValorVaiable(id, variables);
            Boolean resultado =  condicion.evaluar(c,valor, val);
            RESULT = resultado;
            :}
@@ -155,11 +161,7 @@ condicion ::= ID:id comparar:c condicionP:val
 
 condicionP ::= ID:id{:
            String  valor = "";
-                 for (Variables variable : variables) {
-                     if (variable.getNombre().equals(id)) {
-                         valor = variable.getValor();
-                     }
-                 }
+           valor = variable.obtenerValorVaiable(id, variables);
              RESULT = valor.toString();
             :}
            | valor:valor {:
@@ -174,11 +176,7 @@ operaciones ::= valor:val operador:op operacionesP:p {:
              :}
              | ID:id operador:op operacionesP:p{:
               String  valor = "";
-                 for (Variables variable : variables) {
-                     if (variable.getNombre().equals(id)) {
-                         valor = variable.getValor();
-                     }
-                 }
+              valor = variable.obtenerValorVaiable(id, variables);
              System.out.println("Valor: "+valor+" Operador: "+op+" OperacionesP: "+p);
                         String operacion = valor+op+p;
                         System.out.println("Operacion: "+operacion);
@@ -188,11 +186,7 @@ operaciones ::= valor:val operador:op operacionesP:p {:
 
 operacionesP ::=  valor:val {:RESULT = val; :}
                   | ID:id {:
-                  for (Variables variable : variables) {
-                     if (variable.getNombre().equals(id)) {
-                         RESULT = variable.getValor();
-                     }
-                     }
+                  RESULT = variable.obtenerValorVaiable(id, variables);
                   :}
                   | operaciones:c {:RESULT = c;:};
 
@@ -216,21 +210,15 @@ tipo ::= FLOT :f {: RESULT = f.toString(); :}
 concatenar ::= TEXTO:t SUMA concatenarp:c {: RESULT = t.substring(1, t.length() - 1) + c; :}
              | ID:id SUMA concatenarp:c
              {:
-              for (Variables variable : variables) {
-                     if (variable.getNombre().equals(id)) {
-                         RESULT = variable.getValor() + c;
-                     }
-                 }
+                RESULT =  variable.obtenerValorVaiable(id, variables) + c;
+
+
              ;:};
 
 concatenarp::= TEXTO:t {: RESULT = t.substring(1, t.length() - 1); :}
             | ID:id
             {:
-             for (Variables variable : variables) {
-                    if (variable.getNombre().equals(id)) {
-                        RESULT = variable.getValor() ;
-                    }
-                }
+            RESULT =  variable.obtenerValorVaiable(id, variables);
             ;:}
             | concatenar:c {: RESULT = c; :};
 

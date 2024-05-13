@@ -5,9 +5,9 @@ imprimir("El resultado de la suma es: " + resultado);
 imprimir(resultado);
 cadena nombre = "Juan";
 imprimir("Hola " + nombre + " ¿Cómo estás? "+ y);
-cadena nombre2 = "Jua2n";
+cadena nombre2 = "Juan";
 
 si (nombre2 == nombre)  entonces
     entero xd = 1;
-    imprimir(xd);
+    imprimir("prueba if condicion wena" + xd);
 fin_si;
