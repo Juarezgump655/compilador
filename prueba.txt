@@ -8,6 +8,12 @@ imprimir("Hola " + nombre + " ¿Cómo estás? "+ y);
 cadena nombre2 = "Juan";
 
 si (nombre2 == nombre)  entonces
-    entero xd = 1;
+    entero xd = 5+7;
     imprimir("prueba if condicion wena" + xd);
+fin_si;
+
+si (1 > 2)  entonces
+    imprimir("prueba if condicion true");
+sino
+    imprimir("prueba if condicion false");
 fin_si;

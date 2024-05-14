@@ -37,9 +37,11 @@ public class CompiladoresApplication {
 		try {
 			Reader reader = new FileReader("prueba.txt");
 			parser p = new parser(new Scanner(reader));
+
 			p.parse();
 
 			ArrayList<String> consola = new ArrayList<String>(p.consola);
+
 			//Collections.reverse(consola);
 			System.out.println("RESULTADO CONSOLA");
 			for (String s : consola) {

@@ -78,4 +78,14 @@ public class Variables {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "Variables{" +
+                "tipo='" + tipo + '\'' +
+                ", valor='" + valor + '\'' +
+                ", nombre='" + nombre + '\'' +
+                '}';
+    }
+
 }

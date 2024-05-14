@@ -32,6 +32,7 @@ public class CompiladorController {
         try {
             Reader reader = new FileReader("prueba.txt");
             parser p = new parser(new Scanner(reader));
+            p.limpiarConsola();
             p.parse();
 
              consola = new ArrayList<String>(p.consola);

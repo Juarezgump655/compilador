@@ -17,6 +17,10 @@ parser code {:
     public Variables variable = new Variables();
     public Imprimir imprimir = new Imprimir();
      public ArrayList<String> consola = imprimir.getConsola();
+
+     public void limpiarConsola(){
+         imprimir.listaImpri.clear();
+     }
     public void syntax_error(Symbol s){
             error = "Error Sintáctico en la Línea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+".";
             System.err.println(error);
@@ -61,8 +65,8 @@ non terminal intrucciones, instruccionesif;
 non terminal String concatenar, concatenarp;
 non terminal String declaracionP;
 non terminal Metodos funcion;
-non terminal if, ifP;
 non terminal Boolean condicion;
+non terminal ifP, if;
 
 
 
@@ -70,16 +74,44 @@ start with inicio;
 
 
 
-inicio ::= intrucciones{:imprimir.listaImpri.clear();:};
+inicio ::= intrucciones{:
+    for(Variables v: variables){
+        System.out.println(v);
+    }
+        imprimir.ejecutar();
 
-intrucciones  ::= declaracion intrucciones
+        :};
+
+intrucciones  ::= declaracion:p intrucciones {:
+                // variables.add(p);
+                :}
               | print:p intrucciones {:
                 imprimir.listaImpri.add(p);
-                imprimir.ejecutar();
               :}
-              | if intrucciones
+              | if intrucciones {:
+
+              :}
               | /* Vacío */;
 
+declaracion ::= tipo:tipo ID:id PUNTO_COMA {:
+                variables.add( new Variables(tipo, id));
+             RESULT = new Variables(tipo, id);
+            :}
+             | tipo:tipo ID:id ASIGNAR declaracionP:valor  {:
+              System.out.println("Tipo: "+tipo+" ID: "+id+" Valor: "+valor);
+              variables.add( new Variables(tipo, valor, id));
+              RESULT = new Variables(tipo, valor, id);
+              :};
+
+declaracionP ::= valor:valor PUNTO_COMA{:RESULT = valor;:}
+               | operaciones:operacion  PUNTO_COMA {:
+                ScriptEngineManager manager = new ScriptEngineManager();
+                       			ScriptEngine engine = manager.getEngineByName("js");
+                       			Object resultado = engine.eval(operacion);
+                       			System.out.println("Resultado: "+resultado);
+                       			RESULT = resultado.toString();
+               ;:}
+               ;
 
 print ::= IMPRMIR PARENTESIS_IZQ printP:p{:
          RESULT = p;
@@ -107,43 +139,43 @@ parametros ::= tipo ID
            | tipo ID COMA parametros
            | /* Vacío */;
 
-declaracion ::= tipo:tipo ID:id PUNTO_COMA {: variables.add(new Variables (tipo, id)); :}
-             | tipo:tipo ID:id ASIGNAR declaracionP:valor  {:
-              System.out.println("Tipo: "+tipo+" ID: "+id+" Valor: "+valor);
-              variables.add(new Variables(tipo, valor, id)); :};
-
-declaracionP ::= valor:valor PUNTO_COMA{:RESULT = valor;:}
-               | operaciones:operacion  PUNTO_COMA {:
-                ScriptEngineManager manager = new ScriptEngineManager();
-                       			ScriptEngine engine = manager.getEngineByName("js");
-                       			Object resultado = engine.eval(operacion);
-                       			System.out.println("Resultado: "+resultado);
-                       			RESULT = resultado.toString();
-               ;:}
-               ;
 
 
-if ::= SI PARENTESIS_IZQ condicion:condicion PARENTESIS_DER ENTONCES  instruccionesif:p ifP{:
+
+if ::= SI PARENTESIS_IZQ condicion:condicion PARENTESIS_DER ENTONCES  instruccionesif:p ifP:ifp{:
             if (condicion) {
                 System.out.println("Se cumple la condición");
-                imprimir.listaImpri.add(p.toString());
+                if(p instanceof Variables){
+                    System.out.println("Es una variable");
+                    Variables v = (Variables) p;
+                } else if(p != null){
+                    imprimir.listaImpri.add(p.toString());
+                }
             } else {
                  System.out.println("No se cumple la condición");
-                 System.out.println(condicion.toString());
-                 consola.remove(consola.size() - 1);
+                if(ifp != null){
+                 if(ifp instanceof Variables){
+                    Variables v = (Variables) ifp;
+                  } else if(ifp != null){
+                    imprimir.listaImpri.add(ifp.toString());
+                 }
+                }
             }
 :};
 
 ifP ::= FIN_SI PUNTO_COMA
-       | SINO intrucciones FIN_SI PUNTO_COMA;
+       | SINO instruccionesif:p FIN_SI PUNTO_COMA
+       {:
+       RESULT = p;
+
+       :};
 
 instruccionesif ::= declaracion:p instruccionesif{:
-                 variables.add(new Variables(p.tipo, p.valor, p.nombre));
+                  RESULT = p;
                  :}
                 | print:p instruccionesif {:
-                RESULT = p;
+                  RESULT = p;
                 :}
-                | if instruccionesif
                 | /* Vacío */;
 
 
