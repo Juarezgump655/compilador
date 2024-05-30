@@ -8,7 +8,6 @@ imprimir("Hola " + nombre + " ¿Cómo estás? "+ y);
 cadena nombre2 = "Juan";
 
 si (nombre2 == nombre)  entonces
-    entero xd = 5+7;
     imprimir("prueba if condicion wena" + xd);
 fin_si;
 

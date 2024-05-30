@@ -50,7 +50,7 @@ terminal PUNTO_COMA, COMA;
 terminal PARENTESIS_IZQ, PARENTESIS_DER;
 terminal IMPRMIR;
 terminal FUNCTION, SI, ENTONCES, FIN_SI, SINO;
-terminal RETURN, RETORNO, FIN_FUNCION;
+terminal RETURN, RETORNO, FIN_FUNCION, HACER, FINPROCEDIMIENTO, PROCEDIMIENTO, FINMIENTRAS, MIENTRAS;
 
 
 
@@ -66,7 +66,7 @@ non terminal String concatenar, concatenarp;
 non terminal String declaracionP;
 non terminal Metodos funcion;
 non terminal Boolean condicion;
-non terminal ifP, if;
+non terminal ifP, if, ciclos;
 
 
 
@@ -112,6 +112,12 @@ declaracionP ::= valor:valor PUNTO_COMA{:RESULT = valor;:}
                        			RESULT = resultado.toString();
                ;:}
                ;
+
+ciclos ::= MIENTRAS PARENTESIS_IZQ condicion:condicion PARENTESIS_DER HACER instruccionesif:p FINMIENTRAS PUNTO_COMA{:
+            if (condicion) {
+                System.out.println("Se cumple la condición");
+                }
+            :};
 
 print ::= IMPRMIR PARENTESIS_IZQ printP:p{:
          RESULT = p;
@@ -170,13 +176,14 @@ ifP ::= FIN_SI PUNTO_COMA
 
        :};
 
-instruccionesif ::= declaracion:p instruccionesif{:
+instruccionesif ::= declaracion:p instruccionesif {:
                   RESULT = p;
                  :}
                 | print:p instruccionesif {:
                   RESULT = p;
                 :}
                 | /* Vacío */;
+
 
 
 condicion ::= ID:id comparar:c condicionP:val

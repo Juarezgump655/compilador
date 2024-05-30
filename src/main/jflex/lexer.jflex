@@ -211,7 +211,40 @@ texto = \"[^\"\\]+\"
               + " fila: "
               + yyline ); return symbol(sym.FIN_FUNCION, yytext()); }
 
+"mientras" { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.MIENTRAS, yytext()); }
 
+"hacer" { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.HACER, yytext()); }
+
+"fin_mientras" { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.FINMIENTRAS, yytext()); }
+
+"procedimiento" { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.PROCEDIMIENTO, yytext()); }
+
+"fin_procedimiento" { System.out.println("Lexema: "
+                + yytext()
+                + " columna: "
+                + yychar
+                + " fila: "
+                + yyline ); return symbol(sym.FINPROCEDIMIENTO, yytext()); }
 
 "imprimir"  { System.out.println("Lexema imp: "
               + yytext()
