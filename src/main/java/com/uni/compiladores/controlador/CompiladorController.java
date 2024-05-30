@@ -31,13 +31,22 @@ public class CompiladorController {
         consola.clear();
         try {
             Reader reader = new FileReader("prueba.txt");
-            parser p = new parser(new Scanner(reader));
+            Scanner scanner = new Scanner(reader);
+            parser p = new parser(scanner);
             p.limpiarConsola();
+            scanner.limpiarTablaEL();
             p.parse();
 
              consola = new ArrayList<String>(p.consola);
-            Collections.reverse(consola);
+            ArrayList<String> consolaLexica = new ArrayList<String>(scanner.getTablaEL());
             System.out.println("RESULTADO CONSOLA");
+            Collections.reverse(consola);
+           if(!consolaLexica.isEmpty()){
+                for (String s : consolaLexica) {
+                    System.out.println(s);
+                }
+                return consolaLexica;
+            }
             for (String s : consola) {
                 System.out.println(s);
             }

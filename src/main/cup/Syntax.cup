@@ -66,7 +66,7 @@ non terminal String concatenar, concatenarp;
 non terminal String declaracionP;
 non terminal Metodos funcion;
 non terminal Boolean condicion;
-non terminal ifP, if, ciclos;
+non terminal ifP, if;
 
 
 
@@ -113,12 +113,6 @@ declaracionP ::= valor:valor PUNTO_COMA{:RESULT = valor;:}
                ;:}
                ;
 
-ciclos ::= MIENTRAS PARENTESIS_IZQ condicion:condicion PARENTESIS_DER HACER instruccionesif:p FINMIENTRAS PUNTO_COMA{:
-            if (condicion) {
-                System.out.println("Se cumple la condición");
-                }
-            :};
-
 print ::= IMPRMIR PARENTESIS_IZQ printP:p{:
          RESULT = p;
     :}
@@ -146,43 +140,6 @@ parametros ::= tipo ID
            | /* Vacío */;
 
 
-
-
-if ::= SI PARENTESIS_IZQ condicion:condicion PARENTESIS_DER ENTONCES  instruccionesif:p ifP:ifp{:
-            if (condicion) {
-                System.out.println("Se cumple la condición");
-                if(p instanceof Variables){
-                    System.out.println("Es una variable");
-                    Variables v = (Variables) p;
-                } else if(p != null){
-                    imprimir.listaImpri.add(p.toString());
-                }
-            } else {
-                 System.out.println("No se cumple la condición");
-                if(ifp != null){
-                 if(ifp instanceof Variables){
-                    Variables v = (Variables) ifp;
-                  } else if(ifp != null){
-                    imprimir.listaImpri.add(ifp.toString());
-                 }
-                }
-            }
-:};
-
-ifP ::= FIN_SI PUNTO_COMA
-       | SINO instruccionesif:p FIN_SI PUNTO_COMA
-       {:
-       RESULT = p;
-
-       :};
-
-instruccionesif ::= declaracion:p instruccionesif {:
-                  RESULT = p;
-                 :}
-                | print:p instruccionesif {:
-                  RESULT = p;
-                :}
-                | /* Vacío */;
 
 
 
@@ -267,6 +224,42 @@ valor ::= NUM:a {: RESULT = a.toString();:}
 
 
 
+
+if ::= SI PARENTESIS_IZQ condicion:condicion PARENTESIS_DER ENTONCES  instruccionesif:p ifP:ifp{:
+            if (condicion) {
+                System.out.println("Se cumple la condición");
+                if(p instanceof Variables){
+                    System.out.println("Es una variable");
+                    Variables v = (Variables) p;
+                } else if(p != null){
+                    imprimir.listaImpri.add(p.toString());
+                }
+            } else {
+                 System.out.println("No se cumple la condición");
+                if(ifp != null){
+                 if(ifp instanceof Variables){
+                    Variables v = (Variables) ifp;
+                  } else if(ifp != null){
+                    imprimir.listaImpri.add(ifp.toString());
+                 }
+                }
+            }
+:};
+
+ifP ::= FIN_SI PUNTO_COMA
+       | SINO instruccionesif:p FIN_SI PUNTO_COMA
+       {:
+       RESULT = p;
+
+       :};
+
+instruccionesif ::= declaracion:p instruccionesif {:
+                  RESULT = p;
+                 :}
+                | print:p instruccionesif {:
+                  RESULT = p;
+                :}
+                | /* Vacío */;
 
 
 

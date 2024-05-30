@@ -1,4 +1,4 @@
-entero x = 9;
+#entero x = 9;
 entero y = 5;
 entero resultado = x+y * 5+5 * 2+3;
 imprimir("El resultado de la suma es: " + resultado);
@@ -8,6 +8,7 @@ imprimir("Hola " + nombre + " ¿Cómo estás? "+ y);
 cadena nombre2 = "Juan";
 
 si (nombre2 == nombre)  entonces
+    imprimir("prueba if condicion wena");
     imprimir("prueba if condicion wena" + xd);
 fin_si;
 

@@ -36,14 +36,24 @@ public class CompiladoresApplication {
 	public ArrayList<String> compilarCup() {
 		try {
 			Reader reader = new FileReader("prueba.txt");
-			parser p = new parser(new Scanner(reader));
+			Scanner scanner = new Scanner(reader);
+			parser p = new parser(scanner);
+
 
 			p.parse();
 
 			ArrayList<String> consola = new ArrayList<String>(p.consola);
-
+  			ArrayList<String> consolaLexica = new ArrayList<String>(scanner.getTablaEL());
 			//Collections.reverse(consola);
 			System.out.println("RESULTADO CONSOLA");
+
+			if(!consolaLexica.isEmpty()){
+				for (String s : consolaLexica) {
+					System.out.println(s);
+				}
+				return consolaLexica;
+			}
+
 			for (String s : consola) {
 				System.out.println(s);
 			}

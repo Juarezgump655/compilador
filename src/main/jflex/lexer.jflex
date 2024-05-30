@@ -1,5 +1,6 @@
 package mi.primer.scanner;
-
+import util.*;
+import java.util.LinkedList;
 import java_cup.runtime.*;
 %%
 
@@ -13,6 +14,14 @@ import java_cup.runtime.*;
 %cup
 
 %{
+    public static LinkedList<String> TablaEL = new LinkedList<String>();
+    public  LinkedList<String> getTablaEL(){
+        return TablaEL;
+    }
+
+    public void limpiarTablaEL(){
+        TablaEL.clear();
+    }
     private Symbol symbol(int tipo, Object valor) {
         return new Symbol(tipo, yyline, yycolumn, valor);
     }
@@ -291,3 +300,7 @@ texto = \"[^\"\\]+\"
 
 
 {espacios_blanco}   { /*Ignorar estos símbolos*/ }
+
+.               { System.out.println("Error Lexico"+yytext()+" Linea "+yyline+" Columna "+yycolumn);
+                          String datos = new TError(yytext(),yyline,yycolumn,"Error Lexico","Simbolo no existe en el lenguaje").toString();
+                          TablaEL.add(datos);}
