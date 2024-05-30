@@ -12,6 +12,18 @@
             resize: none;
             overflow: auto;
         }
+        #txtMinilab {
+            background-color: black;
+            color: white;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            width: 100%;
+            height: 350px;
+            overflow: auto;
+        }
+        .txtMinilab p {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -25,20 +37,11 @@
                     <div class="col-lg">
                         <label for="txtMini" class="form-label">Codigo MiniLab</label>
                         <textarea id="txtMini" name="txtMini" class="form-control"></textarea>
-                    </div>
-
-                    <div class="col-lg">
                         <label  class="form-label">Traduccion a Minilab</label>
-                        <textarea id="txtMinilab" name="txtMinilab" class="form-control"></textarea>
+                        <textarea id="txtMinilab" name="txtMinilab" class="form-control" readonly></textarea>
                     </div>
                 </div>
                 <br>
-                <div class="row justify-content-center">
-                    <div class="col-sm-4">
-                        <label for="fileJava" class="form-label">Subir archivos con extension .java</label>
-                        <input id="fileJava" type="file" accept=".java" name="fileJava" class="form-control">
-                    </div>
-                </div>
                 <br>
                 <div class="row justify-content-center">
                     <div class="col-sm-2">
@@ -52,6 +55,10 @@
 
     </div>
 </form>
+
+</body>
+</html>
+
 
 <script src="js/logica.js"></script>
 

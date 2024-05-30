@@ -6,10 +6,7 @@ import mi.primer.scanner.parser;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -22,9 +19,21 @@ public class CompiladorController {
     ArrayList<String> consola = new ArrayList<String>();
 
     @PostMapping(value = "/traducir")
-    public ArrayList<String> traducir(/*@RequestParam("txtMini") String txtMini,
-                                      @RequestParam("fileJava") MultipartFile fileJava*/) {
-        return compilarCup();
+    public ArrayList<String> traducir(@RequestParam("txtMini") String txtMini) {
+        try {
+            if(txtMini == null || txtMini.isEmpty()){
+                consola.add("No se ha ingresado texto");
+                return consola;
+            }
+            BufferedWriter writer = new BufferedWriter(new FileWriter("prueba.txt"));
+            writer.write(txtMini);
+            writer.close();
+            return compilarCup();
+        } catch (IOException e) {
+            e.printStackTrace();
+            consola.add("Error al escribir el archivo");
+            return consola;
+        }
     }
 
     public ArrayList<String> compilarCup() {
