@@ -6,7 +6,8 @@ import util.*;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-
+import java.util.ArrayList;
+import java.util.List;
 
 parser code {:
     public ArrayList<Object> resultados = new ArrayList<>();
@@ -15,6 +16,7 @@ parser code {:
     public String error = "";
     public Condicion condicion = new Condicion();
     public Variables variable = new Variables();
+    public InstruccionesIf instruccionesIf = new InstruccionesIf();
     public Imprimir imprimir = new Imprimir();
      public ArrayList<String> consola = imprimir.getConsola();
 
@@ -61,14 +63,13 @@ non terminal Variables declaracion;
 non terminal String printP, print;
 non terminal String operaciones, operador, comparar,  operacionesP ,condicionP ;
 non terminal String parametros;
-non terminal intrucciones, instruccionesif;
+non terminal intrucciones;
 non terminal String concatenar, concatenarp;
 non terminal String declaracionP;
 non terminal Metodos funcion;
 non terminal Boolean condicion;
-non terminal ifP, if;
-
-
+non terminal ifP, if, ciclo;
+non terminal instruccionesif, instruccionesifElse;
 
 start with inicio;
 
@@ -91,7 +92,20 @@ intrucciones  ::= declaracion:p intrucciones {:
               | if intrucciones {:
 
               :}
+              | ciclo intrucciones
               | /* Vacío */;
+
+
+ciclo ::= MIENTRAS PARENTESIS_IZQ condicion:condicion PARENTESIS_DER HACER instruccionesif:p FINMIENTRAS PUNTO_COMA{:
+           /* while(condicion){
+                if(p instanceof Variables){
+                    System.out.println("Es una variable");
+                    Variables v = (Variables) p;
+                } else if(p != null){
+                    imprimir.listaImpri.add(p.toString());
+                }
+            }*/
+         :};
 
 declaracion ::= tipo:tipo ID:id PUNTO_COMA {:
                 variables.add( new Variables(tipo, id));
@@ -101,7 +115,10 @@ declaracion ::= tipo:tipo ID:id PUNTO_COMA {:
               System.out.println("Tipo: "+tipo+" ID: "+id+" Valor: "+valor);
               variables.add( new Variables(tipo, valor, id));
               RESULT = new Variables(tipo, valor, id);
-              :};
+              :}
+              | ID:ID ASIGNAR declaracionP:valor  {:
+                variable.buscarYActualizarVariable(variables, ID, valor);
+               :};
 
 declaracionP ::= valor:valor PUNTO_COMA{:RESULT = valor;:}
                | operaciones:operacion  PUNTO_COMA {:
@@ -228,40 +245,87 @@ valor ::= NUM:a {: RESULT = a.toString();:}
 if ::= SI PARENTESIS_IZQ condicion:condicion PARENTESIS_DER ENTONCES  instruccionesif:p ifP:ifp{:
             if (condicion) {
                 System.out.println("Se cumple la condición");
-                if(p instanceof Variables){
-                    System.out.println("Es una variable");
-                    Variables v = (Variables) p;
-                } else if(p != null){
-                    imprimir.listaImpri.add(p.toString());
+                if(instruccionesIf.getVariables().size() > 0){
+                    for(Variables v: instruccionesIf.getVariables()){
+                        variables.add(v);
+                    }
                 }
+                if(instruccionesIf.getAgregarConsola().size() > 0){
+                    for(String s: instruccionesIf.getAgregarConsola()){
+                        imprimir.listaImpri.add(s);
+                    }
+                }
+                 instruccionesIf.limpiarListaIf();
             } else {
-                 System.out.println("No se cumple la condición");
-                if(ifp != null){
-                 if(ifp instanceof Variables){
-                    Variables v = (Variables) ifp;
-                  } else if(ifp != null){
-                    imprimir.listaImpri.add(ifp.toString());
-                 }
+            if(ifp != null ||  instruccionesIf.getVariablesElse().size() > 0 || instruccionesIf.getAgregarConsolaElse().size() > 0){
+            instruccionesIf.limpiarListaIf();
+              System.out.println("No se cumple la condición");
+                if(instruccionesIf.getVariablesElse().size() > 0){
+                    for(Variables v: instruccionesIf.getVariablesElse()){
+                        variables.add(v);
+                    }
                 }
+                if(instruccionesIf.getAgregarConsolaElse().size() > 0){
+                    for(String s: instruccionesIf.getAgregarConsolaElse()){
+                        imprimir.listaImpri.add(s);
+                    }
+                }
+            }
+             instruccionesIf.limpiarListaElse();
             }
 :};
 
 ifP ::= FIN_SI PUNTO_COMA
-       | SINO instruccionesif:p FIN_SI PUNTO_COMA
-       {:
-       RESULT = p;
+       | SINO instruccionesifElse:p FIN_SI PUNTO_COMA;
 
-       :};
 
-instruccionesif ::= declaracion:p instruccionesif {:
-                  RESULT = p;
+instruccionesif ::= declaracion:p instruccionesif:inst {:
+                   instruccionesIf.agregarVariable(p);
+
+                   if(instruccionesIf.esVariable(inst)){
+                       Variables v = (Variables) p;
+                       instruccionesIf.agregarVariable(v);
+                   } else if(inst != null){
+                       System.out.println("Es una instrucción");
+                       instruccionesIf.agregarConsola(inst.toString());
+                   }
                  :}
-                | print:p instruccionesif {:
-                  RESULT = p;
+                | print:p instruccionesif:inst {:
+                    instruccionesIf.agregarConsola(p.toString());
+                  if(instruccionesIf.esVariable(inst)){
+                       Variables v = (Variables) inst;
+                       instruccionesIf.agregarVariable(v);
+                   } else if(inst != null){
+                       System.out.println("Es una instrucción");
+                       instruccionesIf.agregarConsola(inst.toString());
+                   }
+
                 :}
                 | /* Vacío */;
 
+instruccionesifElse ::= declaracion:p instruccionesif:inst {:
+                   instruccionesIf.agregarVariableElse(p);
 
+                   if(instruccionesIf.esVariable(inst)){
+                       Variables v = (Variables) p;
+                       instruccionesIf.agregarVariableElse(v);
+                   } else if(inst != null){
+                       System.out.println("Es una instrucción else");
+                       instruccionesIf.setAgregarConsolaElse(inst.toString());
+                   }
+                 :}
+                | print:p instruccionesif:inst {:
+                    instruccionesIf.setAgregarConsolaElse(p.toString());
+                  if(instruccionesIf.esVariable(inst)){
+                       Variables v = (Variables) inst;
+                       instruccionesIf.agregarVariableElse(v);
+                   } else if(inst != null){
+                       System.out.println("Es una instrucción else");
+                       instruccionesIf.setAgregarConsolaElse(inst.toString());
+                   }
+
+                :}
+                | /* Vacío */;
 
 
 

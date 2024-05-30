@@ -79,6 +79,17 @@ public class Variables {
         return null;
     }
 
+
+    public String buscarYActualizarVariable(ArrayList<Variables> variables , String id, String nuevoValor) {
+        for (Variables variable : variables) {
+            if (variable.getNombre().equals(id)) { // Suponiendo que getId() devuelve el id de la variable
+                variable.setValor(nuevoValor); // Suponiendo que setValor() permite actualizar el valor de la variable
+                return variable.getValor(); // Salir del método después de encontrar y actualizar la variable
+            }
+        }
+        throw new IllegalArgumentException("La variable con el id " + id + " no existe en la lista");
+    }
+
     @Override
     public String toString() {
         return "Variables{" +

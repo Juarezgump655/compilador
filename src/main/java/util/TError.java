@@ -14,6 +14,6 @@ public class TError {
 
     @Override
     public String toString() {
-        return "Error: "+tipo+" en la linea "+linea+" y columna "+columna+" en el simbolo "+lexema+" "+descripcion;
+        return "Error: "+tipo+" en la linea "+linea+" y columna "+columna+" en el simbolo "+lexema+", "+descripcion;
     }
 }
