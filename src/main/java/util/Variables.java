@@ -1,6 +1,9 @@
 package util;
 
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.util.ArrayList;
 
 public class Variables {
@@ -16,6 +19,7 @@ public class Variables {
 
     public Variables() {
     }
+
 
 
     public Variables(String tipo, String nombre) {
@@ -84,6 +88,7 @@ public class Variables {
         for (Variables variable : variables) {
             if (variable.getNombre().equals(id)) { // Suponiendo que getId() devuelve el id de la variable
                 variable.setValor(nuevoValor); // Suponiendo que setValor() permite actualizar el valor de la variable
+                System.out.println("Se actualizó la variable con el id " + id + " con el valor " + nuevoValor );
                 return variable.getValor(); // Salir del método después de encontrar y actualizar la variable
             }
         }
@@ -97,6 +102,14 @@ public class Variables {
                 ", valor='" + valor + '\'' +
                 ", nombre='" + nombre + '\'' +
                 '}';
+    }
+
+    public String operar(String operacion) throws ScriptException {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("js");
+        Object resultado = engine.eval(operacion);
+        System.out.println("Resultado: "+resultado);
+        return resultado.toString();
     }
 
 }

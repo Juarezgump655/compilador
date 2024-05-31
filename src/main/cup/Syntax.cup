@@ -16,9 +16,10 @@ parser code {:
     public String error = "";
     public Condicion condicion = new Condicion();
     public Variables variable = new Variables();
+    public Ciclos ciclos = new Ciclos();
     public InstruccionesIf instruccionesIf = new InstruccionesIf();
     public Imprimir imprimir = new Imprimir();
-     public ArrayList<String> consola = imprimir.getConsola();
+    public ArrayList<String> consola = imprimir.getConsola();
 
      public void limpiarConsola(){
          imprimir.listaImpri.clear();
@@ -67,9 +68,9 @@ non terminal intrucciones;
 non terminal String concatenar, concatenarp;
 non terminal String declaracionP;
 non terminal Metodos funcion;
-non terminal Boolean condicion;
 non terminal ifP, if, ciclo;
-non terminal instruccionesif, instruccionesifElse;
+non terminal instruccionesif, instruccionesifElse, instrucciones;
+non terminal Condicion condicion;
 
 start with inicio;
 
@@ -96,15 +97,26 @@ intrucciones  ::= declaracion:p intrucciones {:
               | /* Vacío */;
 
 
-ciclo ::= MIENTRAS PARENTESIS_IZQ condicion:condicion PARENTESIS_DER HACER instruccionesif:p FINMIENTRAS PUNTO_COMA{:
-           /* while(condicion){
+ciclo ::= MIENTRAS PARENTESIS_IZQ condicion:con PARENTESIS_DER HACER intrucciones:p FINMIENTRAS PUNTO_COMA{:
+
+            //ciclos.agregarCondicion(con);
+            Boolean c = condicion.evaluar(con);
+            System.out.println("Condición: "+c);
+           while(c){
+
                 if(p instanceof Variables){
-                    System.out.println("Es una variable");
-                    Variables v = (Variables) p;
+                Variables var = (Variables)p;
+
                 } else if(p != null){
                     imprimir.listaImpri.add(p.toString());
                 }
-            }*/
+
+                if(!condicion.evaluar(con)){
+                System.out.println("Se cumple la condición"+ con);
+                break;
+                }
+                con.setValor1(variable.obtenerValorVaiable(con.getiDvariable1(), variables));
+            }
          :};
 
 declaracion ::= tipo:tipo ID:id PUNTO_COMA {:
@@ -159,18 +171,16 @@ parametros ::= tipo ID
 
 
 
-
 condicion ::= ID:id comparar:c condicionP:val
-           {:
+            {:
            String valor = "";
            valor = variable.obtenerValorVaiable(id, variables);
-           Boolean resultado =  condicion.evaluar(c,valor, val);
-           RESULT = resultado;
+           RESULT = new Condicion(c, valor, val, id);
            :}
           | valor:v comparar:c condicionP:val{:
-             Boolean resultado =  condicion.evaluar(c, v, val);
-             RESULT = resultado;
+             RESULT =  new Condicion(c, v, val);
           :};
+
 
 condicionP ::= ID:id{:
            String  valor = "";
@@ -242,8 +252,10 @@ valor ::= NUM:a {: RESULT = a.toString();:}
 
 
 
-if ::= SI PARENTESIS_IZQ condicion:condicion PARENTESIS_DER ENTONCES  instruccionesif:p ifP:ifp{:
-            if (condicion) {
+if ::= SI PARENTESIS_IZQ condicion:c PARENTESIS_DER ENTONCES  instruccionesif:p ifP:ifp{:
+            Boolean con = condicion.evaluar(c);
+            System.out.println("Condición: "+con);
+            if (con) {
                 System.out.println("Se cumple la condición");
                 if(instruccionesIf.getVariables().size() > 0){
                     for(Variables v: instruccionesIf.getVariables()){

@@ -59,6 +59,7 @@ public class CompiladorController {
             for (String s : consola) {
                 System.out.println(s);
             }
+            clearFileContent("prueba.txt");
             return consola;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(CompiladoresApplication.class.getName()).log(Level.SEVERE, "Error al generar en cup ", ex);
@@ -66,6 +67,12 @@ public class CompiladorController {
             throw new RuntimeException(e);
         }
         return null;
+    }
+
+    public static void clearFileContent(String filePath) throws IOException {
+        FileWriter writer = new FileWriter(filePath, false);
+        writer.write("");
+        writer.close();
     }
 
 
